@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      {% block tag_title %}
+      {% endblock %}
+    </title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet"
+          href="/theme/css/{{ CSS_FILE }}" />
+  </head>
+  <body>
+    {% block title%}
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+  </body>
+</html>

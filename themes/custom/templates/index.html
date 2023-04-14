@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block tag_title %}
+{{ SITENAME }}
+{% endblock %}
+
+{% block title %}
+
+<div align="left"><h3>{{ SITENAME }}</h3></div>
+<!-- <div align="center">{{ SITESUBTITLE }}</div> -->
+
+{% endblock %}
+
+
+{% block content %}
+  <hr align="left" width="640px">
+  Welcome !
+  <hr align="left" width="640px">
+
+  <style>
+    h4{
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+  </style>
+  
+  <table>
+      {% for year, date_year in dates|groupby( 'date.year' )|sort(reverse=True) %}
+      <tr>
+        <td></td> <td><h4>{{ year }}</h4></td>
+      </tr>
+        {% for month, articles in date_year|groupby('date.month')|sort(reverse=True) %}
+            {% for article in articles %}
+            <tr>
+                <td>{{ article.date.strftime('%b %d') }}</td>
+                <td><a href="/{{ article.url }}" target="_black">{{ article.title }}</a>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+      {% endfor %}
+  
+  </table>
+  
+  <footer>
+    <hr align="left" width="640px">
+
+    <div>
+      <table>
+          {% for name, link in LINKS %}
+          <td><a href="{{ link }}">{{ name }}</a></td>
+          {% endfor %}
+          {% for name, link in SOCIAL %}
+          <td><a href="{{ link }}">{{ name }}</a></td>
+          {% endfor %}
+      </table>
+    </div>
+    
+    
+    <p class="copyright">&copy; - dylanz.xyz - </p> 
+  </footer>
+  
+  </body>
+
+
+
+{% endblock %}

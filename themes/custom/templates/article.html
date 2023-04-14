@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block tag_title %}
+{{ article.title }}
+{% endblock %}
+
+{% block title %}
+<h1>{{ article.title }}</h1>
+{{ article.date.strftime('%Y-%m-%d %H:%M') }}
+<hr>
+{% endblock %}
+
+
+{% block content %}
+{{ article.content }}
+{% endblock %}
