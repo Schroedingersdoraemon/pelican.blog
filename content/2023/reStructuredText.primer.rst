@@ -2,12 +2,13 @@ reStructuredText primer
 #######################
 :date: 2023-04-10 17:46
 
+.. contents::
+
 0. abstract
 ===========
 
 reStructuredText, or reST, is designed to be a simple yet unobtrusive markup
 language.
-
 
 1. basics
 =========
@@ -258,5 +259,37 @@ Since emacs v24.3 reST support is integrated.
 .. code-block:: rst
 
 		My Section Title
-		===<C-c C-a C-a>
+		=== C-c C-a C-a
 		
+2.2.2 move around sections
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*C-M-a*
+    rst-backward-section
+*C-M-e*
+    rst-forward-section
+
+2.2.3 plain lines to lists
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**C-c C-l**
+
+*C-c C-l C-e*
+    rst-enumerate-region
+*C-c C-l C-b*
+    rst-bullet-list-region
+C-c C-l TAB
+    rst-insert-list
+
+2.2.4 table of contents
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Present table of contents in a temporary buffer. **C-c C-t**
+
+C-c C-t C-t
+    rst-toc
+
+insert table-of-contents
+
+C-c C-t C-i
+    rst-toc-insert
