@@ -29,7 +29,7 @@ ARTICLE_SAVE_AS = '{date:%Y}/{slug}.html'
 # Ignore Git configuration
 OUTPUT_RETENTION = ['.git', '.gitignore']
 
-STATIC_PATH = ['files']
+STATIC_PATHS = ['files']
 
 # DEFAULT_DATE_FORMAT = '%Y-%m-%d'
 
