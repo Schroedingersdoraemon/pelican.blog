@@ -13,7 +13,8 @@ DEFAULT_LANG = 'zh_CN'
 # THEME = 'themes/simple'
 THEME = 'themes/custom'
 
-PLUGINS = [ 'minify', ]
+PLUGINS = [ 'minify',
+            'pelican.plugins.render_math']
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
