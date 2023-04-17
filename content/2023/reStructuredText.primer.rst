@@ -207,17 +207,19 @@ F    F    F
 -----------
 
 .. image:: /files/MNIST-with-LeNet/output1.png
+   :alt: Alternative Text
 
 .. code-block:: rst
 
     .. image:: /path/to/image.png
+	   :alt: Alternative Text is useful to those who probably lose image
 
 1.9. citation
+-------------
 
 Lorem ipsum [Ref]_ dolor sit amet.
 
 .. [Ref] Book or article reference, URL or whatever.
-
 
 2. advanced
 ===========
