@@ -238,11 +238,19 @@ for any real number x:
 
         e^ix = cos x + i sin x
 
-Another famous formula inlined here is :math:`a^2 + b^2 = c^2`.
+Mean Squared Error Loss, or MSE Loss:
+
+.. math::
+
+   J_{MSE} = \frac{1}{N}\sum_{i=1}^N(y_i - \hat{y}_i)^2
+
+Here inlined a famous formula: :math:`a^2 + b^2 = c^2`.
 
 .. code-block:: rst
 
     :math:`a^2 + b^2 = c^2`
+
+For another instance, sigmoid function is defined as :math:`f(x) = \frac{1}{1+e^{-x}}`
 
 2.2. emacs rst-mode
 -------------------
