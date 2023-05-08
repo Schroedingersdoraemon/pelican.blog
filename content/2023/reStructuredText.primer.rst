@@ -221,6 +221,15 @@ Lorem ipsum [Ref]_ dolor sit amet.
 
 .. [Ref] Book or article reference, URL or whatever.
 
+1.10. table of contents
+-----------------------
+
+The following code automatically expands to table of contents.
+
+.. code-block:: rst
+
+   .. contents::
+
 2. advanced
 ===========
 
