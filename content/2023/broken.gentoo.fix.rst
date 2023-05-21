@@ -96,7 +96,8 @@ Btrfs 的子卷并不是块设备，而是独立可挂载的 POSIX filetree
 
    # btrfs subvolume create /snapshoot
 
-我将 home 文件夹设为了子卷，所以需要快照两次，因为其不是递归的
+我将 home 文件夹设为了子卷，所以需要快照两次，因为 btrfs 的快照 **不是递归的** ，
+子卷存在的地方会被映射为同名的空文件夹
    
 .. code-block:: shell
 
