@@ -216,3 +216,44 @@ RAdio Detection And Ranging, RADAR
 
 2. 源定位：算法与分析
 =====================
+
+Assuming that the disturbances in the measurements are zero-mean Gaussian
+distributed, the Cramér–Rao lower bound (CRLB), which gives a lower bound
+on the variance attainable by any unbiased location estimator using the same
+data, will also be provided.
+
+假定测量中的干扰是零均值高斯分布，还将提供 Cramer-Rao 下限 (CRLB)，
+其给出了使用相同数据的任何无偏位置估计器可达到的方差的下限。
+
+看完这章的学习成果：
+
+1). 用到 TOA, TDOA, RSS 和 DOA 测量的定位算法的发展
+
+2). 位置估计的性能测量
+
+2.1. Introduction
+-----------------
+
+The position of a target of interest can be determined by utilizing its emitted signal
+measured at an array of spatially separated receivers with a priori known locations.
+
+**assume there are no outliers**
+  shadowing and multipath propagation errors are sufficiently small
+
+**assume LOS transmission**
+  NLOS 会造成距离信息中较大的正偏差
+
+2.2. 源定位的度量模型与原理
+---------------------------
+
+.. math::
+
+   \textbf{r} = \textbf{f}(\textbf{x}) + \textbf{n}
+
+where :math:`\textbf{r}` 是测量值向量，:math:`\textbf{x}` 是待定位的坐标，
+:math:`\textbf{f}` 是已知的非线性函数，:math:`\textbf{n}` 是 0 均值的噪声向量。
+
+2.2.1. TOA
+~~~~~~~~~~
+
+三个或更多基站时，把有噪的 TOA 转化为方程组，再根据已知基站 **最优化** 定位更好
