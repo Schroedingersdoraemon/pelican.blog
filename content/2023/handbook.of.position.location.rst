@@ -257,3 +257,39 @@ where :math:`\textbf{r}` 是测量值向量，:math:`\textbf{x}` 是待定位的
 ~~~~~~~~~~
 
 三个或更多基站时，把有噪的 TOA 转化为方程组，再根据已知基站 **最优化** 定位更好
+
+令 :math:`\textbf{x} = [x \space{} y]^T` 为未知终端，
+:math:`\textbf{x}_l = [x_l \space{} x_l]^T` 为已知基站，则终端与第l个基站之间的距离
+:math:`d_l` 就是
+
+.. math::
+
+   d_l = \| \textbf{x} - \textbf{x}_l \|_2 = \sqrt{(x-x_l)^2+(y-y_l)^2}
+
+设 :math:`t_l` 为信号从基站 *l* 到达终端机的传播时间，则显然
+
+.. math::
+
+   t_l = \frac{d_l}{c}
+
+现实生活中，TOA 不可避免地存在误差，所以由 :math:`t_l` 和 *c*
+相乘表示的距离与实际测量值的关系可以表示为
+
+.. math::
+
+   r_{TOA,l} = d_l + n_{TOA,l} = \sqrt{(x-x_l)^2+(y-y_l)^2} + n_{TOA,l}
+
+上式可表达为向量形式
+
+.. math::
+
+   \textbf{r}_{TOA} = \textbf{f}_{TOA}(\textbf{x}) + \textbf{n}_{TOA}
+
+为了便于算法的开发分析以及 CRLB 的计算，
+:math:`{n_{TOA,l}}` 是零均值非相关的高斯过程。
+
+2.2.2. TDOA
+~~~~~~~~~~~
+
+TDOA 是信号到达一对传感器的时间之差，而且 TDOA 不需要接收机的时钟和他们一起同步。将 TDOA 与传播速度 c 相乘得到接收机与两个基站的范围之差。每个 TDOA 定义了一个接收机位于其上的双曲线，而目标位置就在至少两条双曲线的交点上。
+

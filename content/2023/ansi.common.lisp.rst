@@ -307,9 +307,203 @@ function that takes a function as an argument is *apply*
 
    > (apply #'+ '(1 2 3))
    6
-   > (apply #'+ 1 2 '(3 4 5))
+   > (apply #'+ 1 2 '(3 4 5))  ; any number of arguments, so long as the last is a list
    15
    ; funcall does the same thing but does not need the arguments to be
    packaged in a list
    > (funcall #'+ 1 2 3)
    6
+
+   > (funcall #'(lambda (x) (+ x 1))
+		1)
+   2
+
+2.15. types
+-----------
+
+cl types from a hierachy of subtypes and supertypes.
+27 is of type *fixnum, integer, rational, real, number, atom, and t*, in order of increasing generality.
+
+.. code-block:: lisp
+
+   > (typep 27 'integer)
+   T
+
+2.16. looking forward
+---------------------
+
+So far we have barely scratched the surface of Lisp.
+
+- interactive on toplevel
+- prefix syntax means any number of arguments
+- parentheses are not an issue, we use indentation
+- funcional programming, which avoid side-effects, is the dominant paradigm
+
+2.17. exercise
+--------------
+
+#. describe what happens when the following expressions are evaluated
+
+   - (+ (- 5 1) (+ 3 7))  ; 14
+   - (list 1 (+ 2 3))  ; (1 5)
+   - (if (listp 1) (+ 1 2) (+ 3 4))  ; 7
+   - (list (and (listp 3) t) (+ 1 2))  ; (nil 3)
+
+#. give three distinct *cons* expressions that return (a b c)
+
+   - (cons 'a '(b c))
+   - (cons 'a (cons 'b '(c)))
+   - I can't think of another solution...
+
+#. using *car* and *cdr*, define a function to return the fourth element of a list
+
+   .. code-block:: lisp
+
+      (defun my-fourth (lst)
+         (car (cdr (cdr (cdr lst)))))
+
+#. define a function that takes two arguments and returns the greater of the two
+
+   .. code-block:: lisp
+
+      (defun my-greater (x y)
+         (if (> x y)
+	     x
+	     y))
+
+#. what do these functions do
+
+   .. code-block:: lisp
+
+      (defun enigma (x)
+         (and (not (null x))
+	      (or (null (car x))
+	          (enigma (cdr x)))))
+
+      ; if nil is in x
+
+   .. code-block:: lisp
+
+      (defun mystery (x y)
+         (if (null y)
+	     nil
+	     (if (eql (car y) x)
+	     0
+	     (let ((z (mystery x (cdr y))))
+	          (and z (+ z 1))))))
+
+      ; count number of elements in y which differ x
+
+#. what could occur in place of the *x* in each of the following exchanges
+
+   - > (car (**car** (cdr '(a (b c) d))))
+     B
+   - > (**or** 13 (/ 1 0))
+     13
+   - > (**apply** #'list 1 nil)
+     (1)
+
+#. using only operators introduced in this chapter, define a function that takes a list as an argument and returns true if one of its elements is a list
+
+   .. code-block:: lisp
+
+      (defun if-have-list (lst)
+         (if (null lst)
+           nil
+           (if (listp (car lst))
+             t
+             (if-have-list (cdr lst)))))
+
+#. give iterative and recursive definitions of a function that
+
+   (1) takes a positive integer and prints that many dots
+
+   .. code-block:: lisp
+
+      (defun print-dots-iteratively (x)
+         (do ((i 0 (+ i 1)))
+	     ((eql i x) 'done)
+	     (format t ".")
+	 )
+      )
+
+   .. code-block:: lisp
+
+      (defun print-dots-recursively (x)
+         (if (eql x 0)
+	     'done
+	     (progn
+	        (format t ".")
+		(print-dots-recursively (- x 1)))))
+
+   (2) takes a list and returns the number of times the symbol *a* occurs in it
+
+   .. code-block:: lisp
+
+      (defun a-interative-counter (lst)
+          (let ((count 0))
+	     (dolist (obj lst)
+	        (if (eql obj 'a)
+	           (setf count (+ count 1))))
+	      count))
+
+   .. code-block:: lisp
+
+      (defun a-recursive-counter (lst)
+         ()
+      )
+
+#. a friend is trying to write a function that returns the sum of all the non-nil elements in a list. he has written two versions of this function, and neither of them work. explain what's wrong with each, and give a correct version
+
+   (a)
+       .. code-block:: lisp
+
+	  (defun summit (lst)
+	     (remove nil lst)
+	     ; (setf lst (remove nil lst)) to update lst
+	     (apply #'+ lst))
+
+   (b)
+       .. code-block:: lisp
+
+	  (defun summit (lst)
+	     (let ((x (car lst)))
+	        (if (null x)
+		    ; I strongly doubt here goes wrong
+		    ; (cdr last-element) is still nil
+		    ; so this is an infinite loop
+		    (summit (cdr lst))
+		    (+ x (summit (cdr lst))))))
+
+
+3. Lists
+========
+
+3.1. conses
+-----------
+
+.. code-block:: lisp
+
+   > (setf x (cons 'a nil))
+   > (setf y (list 'a 'b 'c))  ; flat list
+   > (setf z (list 'a (list 'b 'c) 'd))  ; nested list
+
+   (defun my-listp (x)
+       (or (null x) (consp x)))
+
+   (defun my-atom (x)
+       (not (consp x)))
+
+*nil* is both an *atom* and *list*
+
+3.2. equality
+-------------
+
+calling *cons* makes lisp allocate a piece of memory for two pointers, so calling *cons* twice generates two distinctly different objects.
+
+.. code-block:: lisp
+
+   > (eql (cons 'a nil) (cons 'a nil))
+   NIL
+
+*eql* returns true only if **the same object**, and *equal* only needs printed result being same.
