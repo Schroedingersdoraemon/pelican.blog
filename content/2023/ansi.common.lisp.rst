@@ -474,3 +474,36 @@ So far we have barely scratched the surface of Lisp.
 		    ; so this is an infinite loop
 		    (summit (cdr lst))
 		    (+ x (summit (cdr lst))))))
+
+
+3. Lists
+========
+
+3.1. conses
+-----------
+
+.. code-block:: lisp
+
+   > (setf x (cons 'a nil))
+   > (setf y (list 'a 'b 'c))  ; flat list
+   > (setf z (list 'a (list 'b 'c) 'd))  ; nested list
+
+   (defun my-listp (x)
+       (or (null x) (consp x)))
+
+   (defun my-atom (x)
+       (not (consp x)))
+
+*nil* is both an *atom* and *list*
+
+3.2. equality
+-------------
+
+calling *cons* makes lisp allocate a piece of memory for two pointers, so calling *cons* twice generates two distinctly different objects.
+
+.. code-block:: lisp
+
+   > (eql (cons 'a nil) (cons 'a nil))
+   NIL
+
+*eql* returns true only if **the same object**, and *equal* only needs printed result being same.
