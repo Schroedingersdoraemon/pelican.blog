@@ -162,7 +162,8 @@ ambidextrous, ambidexterity
 
     *Greek* mankind
 
-phil'anthropy, philanthropist
+    phil'anthropy, philanthropist
+
 
 misanthrope
 
@@ -171,25 +172,24 @@ misanthrope
     hates people
 
 
-**gyne**
-
-    woman
-
 misogynist
 
+    **gyne** woman
+
     hates woman
+
 
 gynecologist
 
     medical specialist who treats femail disorders
 
-**gamos**
-
-    marriage
 
 misogamist
 
+    **gamoes** marriage
+
     hates marriage
+
 
 monogamy
 
@@ -197,12 +197,14 @@ monogamy
 
     one marriage at a time
 
+
 bigamy
 
     **bi** two
 
     the unlawful act of contracting another marriage without divorcing one's
     current legal spouse
+
 
 poly'gamy
 
