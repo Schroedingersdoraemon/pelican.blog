@@ -11,6 +11,8 @@ Aug 12, 2021: using electron-qq and electron-wechat now :)
 
 Nov 29, 2020: 多年之后的更新： deepin.com.qq.office挺好用的，懒得折腾了。
 
+Mar 06, 2026: 惊觉已经有了官方可用的 linux 版本，而我依然坚守在 gentoo
+
 # 1、 安装
 
 安装 wine，下载 QQ 和微信的安装程序。
