@@ -4,13 +4,13 @@
 }
 
 .highlight, code {
-    background: #eeeeef;
+    background: #f7f7f7;
     color: black;
-}
+}/*
 .highlight {
     white-space: pre-wrap;
     word-wrap: break-word;
-}
+}*/
 
 body{
     max-width: 900px;
@@ -32,4 +32,106 @@ h3{
 
 h4{
     font-size: 16px;
+}
+
+.article-content h1,
+.article-content h1 ~ p,
+.article-content h1 ~ ul,
+.article-content h1 ~ ol {
+    margin-left: 0;
+}
+
+.article-content h2,
+.article-content h2 ~ p,
+.article-content h2 ~ ul,
+.article-content h2 ~ ol {
+    margin-left: 2em;
+}
+
+.article-content h3,
+.article-content h3 ~ p,
+.article-content h3 ~ ul,
+.article-content h3 ~ ol {
+    margin-left: 4em;
+}
+
+.article-content h4,
+.article-content h4 ~ p,
+.article-content h4 ~ ul,
+.article-content h4 ~ ol {
+    margin-left: 6em;
+}
+
+.article-content p {
+    line-height: 1.6;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.article-content ul,
+.article-content ol {
+    padding-left: 1em;
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+}
+
+.article-content ul ul,
+.article-content ol ol {
+    margin-left: 2em;
+}
+
+.article-content li > p {
+    margin-left: 0;
+    margin-bottom: 0.3em;
+}
+
+.article-content .toc a {
+    color: #007acc;
+}
+
+.article-content .highlight {
+    margin-left: 0;
+    overflow-x: auto;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    padding: 0.5em;
+    border-radius: 4px;
+}
+
+.article-content pre {
+    white-space: pre;
+    margin: 0;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.article-content hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+}
+
+
+/* ---------------------------
+   引用块样式
+--------------------------- */
+.article-content blockquote {
+    background-color: #f5f5f5;
+    border-left: 4px solid #999;
+    padding: 0.5em 1em;
+    margin: 1em 0;
+    color: #555;
+    border-radius: 4px;
+    line-height: 1.6;
+}
+
+.article-content blockquote > *:not(.math):not(.highlight) {
+    margin: 0.5em 0;
 }

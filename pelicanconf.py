@@ -48,7 +48,9 @@ MARKDOWN = {
     'markdown.extensions.toc': {
       'title': ''
     },
-    'markdown.extensions.codehilite': {'css_class': 'highlight'},
+    'markdown.extensions.codehilite': {
+        'css_class': 'highlight'
+    },
     'markdown.extensions.extra': {},
     'markdown.extensions.meta': {},
   },
