@@ -86,7 +86,8 @@ h4{
 }
 
 .article-content .toc a {
-    color: #007acc;
+    /* color: #7731c6; */
+    color: #1313ef;
 }
 
 .article-content .highlight {
