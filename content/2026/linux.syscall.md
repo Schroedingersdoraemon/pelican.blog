@@ -6,8 +6,6 @@ tags:
 
 [TOC]
 
-test
-
 road map:
 write -> glibc -> syscall -> syscall asm
 -> TRAP to [MSR]Model Specific Register
