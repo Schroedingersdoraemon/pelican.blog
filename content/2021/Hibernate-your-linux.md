@@ -13,7 +13,6 @@ tags:
 
 - **Suspend to both**, usually called **hybrid suspend**, saves the machine's state into swap space, but does not power off the machine. Instead, it invokes usual suspend to RAM. Therefore, if the battery is not depleted, the system can resume from RAM. If the battery is depleted, the system can be resumed from disk, which is much slower than resuming from RAM, but the machine's state has not been lost.
 
-
 # 1. Low level interfaces
 
 ## 1.1 kernel (swsusp)
@@ -24,12 +23,11 @@ The most straightforward approach is to directly inform the in-kernel software s
 
 Userspace Software Suspend
 
-
 # 2. High level interfaces
 
 ## 2.1 systemd
 
-systemd provides native commands  for suspend, hibernate, hybrid suspend
+systemd provides native commands for suspend, hibernate, hybrid suspend
 
 # 3. Kernel Documentation
 
@@ -46,7 +44,7 @@ The kernel documentation of Power Management Interface for System Sleep is [here
 
 ## 3.2 /sys/power/disk
 
-`sys/power/disk`  controls the operating mode of hibernation, or suspend to disk. It tells the kernel what to do next after the creation of hibernation image.  Currently selected option is printed in square brackets.
+`sys/power/disk` controls the operating mode of hibernation, or suspend to disk. It tells the kernel what to do next after the creation of hibernation image. Currently selected option is printed in square brackets.
 
 - **platform**, put the system into sleep using a platform-provided method, is only available if the platform provides a special mechanism to sleep the system after the creation of hibernation image.
 - **shudown**, shut the system down.
@@ -58,8 +56,8 @@ The kernel documentation of Power Management Interface for System Sleep is [here
 
 `/sys/power/image_size` controls the size of hibernation images.
 
-It can be written a string representing a non-negative integer that will be used as a best-effort upper limit of the image size, in bytes.  The hibernation
-core will do its best to ensure that the image size will not exceed that number. However, if that turns out to be impossible to achieve, a hibernation image will still be created and its size will be as small as possible.  In particular, writing '0' to this file will enforce hibernation images to be as small as possible.
+It can be written a string representing a non-negative integer that will be used as a best-effort upper limit of the image size, in bytes. The hibernation
+core will do its best to ensure that the image size will not exceed that number. However, if that turns out to be impossible to achieve, a hibernation image will still be created and its size will be as small as possible. In particular, writing '0' to this file will enforce hibernation images to be as small as possible.
 
 Reading from this file returns the current image size limit, which is set to around 2/5 of available RAM by default.
 
@@ -69,17 +67,17 @@ Reading from this file returns the current image size limit, which is set to aro
 
 # 4. configuration
 
-A swap partition or swap file is need. Then you will point the kernel to the *swap* using the `resume=` kernel parameter in oot loader. To configure the initramfs is also needed to tell the kernel.
+A swap partition or swap file is need. Then you will point the kernel to the _swap_ using the `resume=` kernel parameter in oot loader. To configure the initramfs is also needed to tell the kernel.
 
 ## 4.1 swap size
 
-According to [previous content](#kernel-documentation) of system sleep, a small swap partation is also very likely to hibernate successfully. By the way, you are *strongly* recommended to read the kernel documentation mentioned previously, which offers numerous help in a straightforward way.
+According to [previous content](#kernel-documentation) of system sleep, a small swap partation is also very likely to hibernate successfully. By the way, you are _strongly_ recommended to read the kernel documentation mentioned previously, which offers numerous help in a straightforward way.
 
-The size of *swap_file* or *swap_partition* is recommended to be about **one to twice the RAM size**.
+The size of _swap_file_ or _swap_partition_ is recommended to be about **one to twice the RAM size**.
 
 ## 4.2 swap_file
 
-According to [kernel documentation](https://www.kernel.org/doc/Documentation/power/swsusp-and-swap-files.txt), to use a *swap_file*, you need to:
+According to [kernel documentation](https://www.kernel.org/doc/Documentation/power/swsusp-and-swap-files.txt), to use a _swap_file_, you need to:
 
 1. Create the swap file and make it active,
 
@@ -89,7 +87,7 @@ According to [kernel documentation](https://www.kernel.org/doc/Documentation/pow
    swapon <path_to_swap_file>
    ```
 
-2. Use an application that will bmap the *swap_file* with the help of the FIBMAP ioctl and determine the location of the file's swap header, as the **offset**, in *PAGE_SIZE* units, from the beginning of the partition which holds the swap file.
+2. Use an application that will bmap the _swap_file_ with the help of the FIBMAP ioctl and determine the location of the file's swap header, as the **offset**, in _PAGE_SIZE_ units, from the beginning of the partition which holds the swap file.
 
 3. Update kernel parameter
 
@@ -97,15 +95,15 @@ According to [kernel documentation](https://www.kernel.org/doc/Documentation/pow
    resume=<swap_file_partition> resume_offset=<swap_file_offset>
    ```
 
-   where *swap_file_partition* is the partition on which the swap file is located, and *swap_file_offset* is the offset of the swap header determined by the application in step 2.
+   where _swap_file_partition_ is the partition on which the swap file is located, and _swap_file_offset_ is the offset of the swap header determined by the application in step 2.
 
-   *swap_file*:  
+   _swap_file_:
 
    ```shell
    findmnt -no UUID -T <path_to_swap_file>
    ```
 
-   *swap_file_offset*:
+   _swap_file_offset_:
 
    ```shell
    filefrag -v <path_to_swap_file> | awk '{if($1="0:"){print substr($4, 1, length($4)-2)} }'
@@ -113,13 +111,29 @@ According to [kernel documentation](https://www.kernel.org/doc/Documentation/pow
 
 ## 4.3 configure initramfs
 
+### 4.3.1 dracut
+
+```bash
+cat << EOF | doas tee -a /etc/dracut.conf
+add_dracutmodules+=" resume "
+EOF
+```
+
+### 4.3.2 mkinitcpio
+
 `resume` hook should be added in `/etc/mkinitcpio.conf` after `base` and `udev`.
 
 If `systemd` hook is used, the hibernation mechanism is already provided, and no further hooks are needed.
 
+### 4.3.3 genkernel
+
+```bash
+genkernel --install resume
+```
+
 ## 4.4 configure boot loader
 
-resume=*swap_device*
+resume=_swap_device_
 
 - resume=PART_UUID
 - resume="PARTLABEL=Swap Partition"
@@ -130,13 +144,13 @@ Here lists several boot loaders for demonstration. You can get PARTUUID using `b
 
 edit /boot/oader/entries/arch.conf
 
-options root=UUID=... rw resume=PARTUUID=*swap_area*
+options root=UUID=... rw resume=PARTUUID=_swap_area_
 
 ### 4.4.2 grub
 
 edit /etc/default/grub
 
-GRUB_CMDLINE_LINUX_DEFAULT="resume=PARTUUID=*swap_area*"
+GRUB*CMDLINE_LINUX_DEFAULT="resume=PARTUUID=\_swap_area*"
 
 then regenerate the grub.cfg:
 
@@ -148,7 +162,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 same
 
-resume=PARTUUID=*swap_area*
+resume=PARTUUID=_swap_area_
 
 ## 4.5 reboot right away
 
