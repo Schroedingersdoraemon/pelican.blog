@@ -6,67 +6,205 @@ tags:
 
 [TOC]
 
-# 0. pre
+# 0. boot
 
-## 0.0. armbian
+boot 有两种方法
+
+- [从头编译uboot](#00-compile-uboot)
+- [拿来主义：巧得二进制](#01-optional-retrieve-armbian-boot)
+
+## 0.0. compile uboot
+
+```shell
+git clone --depth=1 https://github.com/u-boot/u-boot
+git clone --depth 1 https://github.com/rockchip-linux/rkbin.git
+```
+
+把 rk322xh_bl31_v1.49.elf 和 rk3328_ddr_400MHz_V1.21.bin 拿出来
+
+```shell
+# 这里放到了 u-boot 里面
+mkdir u-boot/external.rockchip
+cp rkbin/bin/rk33/{rk322xh_bl31_v1.49.elf,rk3328_ddr_400MHz_V1.21.bin} \
+    u-boot/external.rockchip
+```
+
+这两个环境变量很重要，否则无法编译成功
+
+```shell
+cd u-boot/
+export BL31=./external.rockchip/rk322xh_bl31_v1.49.elf
+export ROCKCHIP_TPL=./external.rockchip/rk3328_ddr_400MHz_v1.21.bin
+```
+
+根据文件 configs/roc-cc-rk3328_defconfig
+
+```shell
+make roc-cc-rk3328_defconfig
+```
+
+u-boot 现在需要 as 等工具，所以只能暂且使用 crossdev
+
+```shell
+doas crossdev --stage2 --target aarch64-unknown-linux-gnu
+```
+
+如此这般就获得了 aarch64-unknown-linux-gnu- 系列的工具
+
+编译之前请检查 pyelftools，gentoo 可以通过 app-misc/paxutils python 避免增加 world 条目
+否则不会产生 u-boot.itb，且会报错如下：
+
+> Wrote map file './simple-bin.map' to show errors
+> binman: Node '/binman/simple-bin/fit': subnode 'images/@atf-SEQ':
+> Failed to read ELF file: Python: No module named 'elftools'
+
+最后编译如下：
+
+```shell
+make HOSTCC=clang LLVM=1 CROSS_COMPILE=aarch64-unknown-linux-gnu- CC=clang -j10
+```
+
+获得了 **idbloader.img** 和 **u-boot.itb**。
+
+## 0.1. (optional) retrieve armbian boot
 
 首先获取 [armbian renegade noble](https://mirrors.bfsu.edu.cn/armbian-releases/renegade/archive)
 
-### 0.0.0. 获取 boot 分区
+> Noble Ubuntu 24.04 LTS  
+> Resolute Ubuntu 26.04  
+> Trixie Debian 13  
+> _help yourself_
+
+可以拿出固件部分，也可以直接 pipe 到 of=/dev/sdX
 
 ```shell
-xz -d -c ./Armbian_26.2.1_Renegade_noble_current_6.18.8_minimal.img.xz | doas dd of=rk3328_boot.bin bs=512 count=32768
+xz -d -c ./Armbian_26.2.1_Renegade_noble_current_6.18.8_minimal.img.xz \
+    | doas dd of=rk3328_boot.bin bs=512 count=32768
 ```
 
-### 0.0.1. (可选) 体验 armbian
+# 1. flash your card
 
-为 /dev/sdX 设备 dd 写入 armbian.img
+初始化 tf 卡，数据无价，谨慎操作！
 
 ```shell
-xz -d -c ./Armbian_26.2.1_Renegade_noble_current_6.18.8_minimal.img.xz | doas dd of=/dev/sdb bs=4M progress
-```
-
-然后从 armbian 获取 boot 固件分区
-
-```shell
-doas dd if=/dev/sdb of=rk3328_boot.pre32768.bin bs=512 count=32768
-```
-
-然后为设备扩容，通过 fdisk 记录/dev/sdb1 扇区起始位置 32768。
-
-```
 doas fdisk /dev/sdb
+g # new GPT disklabel
+w # write
+q # quit
 ```
 
-然后删除 /dev/sdb1 ， **n** 增加分区，起始扇区 32768，默认最后扇区结束。
+为 /dev/sdX 设备 dd 写入 固件分区
+
+```shell
+doas dd if=./rk3328_boot.bin of=/dev/sdb bs=512 count=32768 status=progress
+```
+
+接着重建 gpt 分区表
 
 **不要 remove 现存 ext4 signature**
 
-随即应用扩容
-
 ```shell
-doas e2fsck -f /dev/sdb1
-doas resize2fs /dev/sdb1
+doas fdisk /dev/sdb
+g # new GPT disklabel
+n # 创建新分区
+1 # 分区号默认是1
+32768 #        重要！ 从 16M （512kb/扇区 x 32768 扇区）处开始
+回车 # 扩展到最后
+n #           重要！ 不要擦除 signature
+w # write
+q # quit
 ```
 
-扩容后自动分区 /dev/sdb1 充当 root ， 并格式化。
-
-## 0.1. 已有 boot 备份
-
-```shell
-doas dd if=./rk3328_boot.pre32768.bin of=/dev/sdb bs=1M conv=notrunc
-```
-
-并格式化
+最后 mkfs
 
 ```shell
 doas mkfs.ext4 /dev/sdb1
-# 如果寻求更高性能可以 doas mkfs.ext4 -O ^has_journal /dev/sdb1
+# 如果寻求更高性能，且无需 log，可 doas mkfs.ext4 -O ^has_journal /dev/sdb1
 ```
 
-# 1. grab files
+> 请忽略此处  
+> 如果直接 dd 某 img，那么此处可能需要这些指令。
+>
+> doas e2fsck -f /dev/sdb1  
+> doas resize2fs /dev/sdb1
 
-## 1.1. get gentoo stage3
+# 2. kernel
+
+类似的，kernel 也有两种方法
+
+- [编译 Image dtbs from scratch](#21-compile-image-and-dtbs)
+- [拿来主义：获得现成发行产物](#22-optional-use-binary)
+
+## 2.1. compile Image and dtbs
+
+copy gentoo-sources to your workspace
+
+```shell
+make ARCH=arm64 defconfig
+make ARCH=arm64 menuconfig
+```
+
+然后 platforms 只保留 rockchip platforms
+
+再按照需求 disable 某些特性，例如 virtualization 和无用的驱动
+
+```shell
+make ARCH=arm64 LLVM=1 LLVM_IAS=0 \
+     CROSS_COMPILE=aarch64-unknown-linux-gnu- \
+     -j$(nproc) \
+     Image dtbs modules
+```
+
+然后 arch/arm64/boot 处获得 Image 和 .../dts/rockchip/rk3328-roc-cc.dtb
+
+再安装 modules
+
+```shell
+doas make ARCH=arm64 INSTALL_MOD_PATH=/mnt modules_install
+```
+
+如果需要 initramfs，除了 menuconfig 中麻烦配置。
+
+还可以通过 systemd-nspawn 异构 chroot 中 mkinitcpio
+
+> ls /lib/modules  
+> 6.19.11-1-aarch64-ARCH 7.0.1-gentoo
+
+```shell
+mkinitcpio -k 7.0.1-gentoo -g initramfs-gentoo.img
+```
+
+然后把产物放在 /boot 中并修改 extlinux.conf
+
+## 2.2. (optional) use binary
+
+根据你的发行版偏好要求
+
+- [gentoo](#221-gentoo)
+- [archlinux](#222-alarm)
+
+### 2.2.1. gentoo
+
+#### 2.2.2.1. 获取 alarm 内核产物
+
+选择镜像 [bfsu mirror](https://mirrors.bfsu.edu.cn/archlinuxarm/os/)
+获得 ArchLinuxArm-aarch64-latest.tar.gz ， 并解压出 boot
+
+```shell
+tar xpfv ArchLinuxArm-aarch64-latest.tar.gz ./boot
+# 复制 boot 的 Image initramfs-linux.img dtbs/rockchip/rk3328-roc-cc.dtb
+cp ./boot/{Image,initramfs-linux.img,dtbs/rockchip/rk3328-roc-cc.dtb} /mnt
+```
+
+另外要把 arch rootfs 里面的 modules 拷贝过去
+
+```shell
+tar xpfv ArchLinuxArm-aarch64-latest.tar.gz ./usr/lib/modules
+```
+
+#### 2.2.2.2. gentoo stage3
+
+grab gentoo stage3 files
 
 选择镜像 [bfsu mirror](https://mirrors.bfsu.edu.cn/gentoo/releases)
 获得 gentoo arm64 的 current-stage3-arm64-systemd 的 tar.xz 文件。
@@ -77,52 +215,30 @@ doas mkfs.ext4 /dev/sdb1
 doas tar xfpv stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner -C /mnt
 ```
 
-## 1.2. get kernel initramfs and dtb
+### 2.2.2. alarm
 
-选择镜像 [bfsu mirror](https://mirrors.bfsu.edu.cn/archlinuxarm/os/) 
-获得 ArchLinuxArm-aarch64-latest.tar.gz ， 并解压出 boot
-
-```shell
-tar xpfv ArchLinuxArm-aarch64-latest.tar.gz ./boot
-```
-
-复制 boot 的 Image initramfs-linux.img dtbs/rockchip/rk3328-roc-cc.dtb 到 /mnt/boot
-
-
-另外要把 arch rootfs 里面的 modules 拷贝过去
-
-```shell
-tar xpfv ArchLinuxArm-aarch64-latest.tar.gz ./usr/lib/modules
-```
-
-### 1.3.3. （可选）plain archlinux arm
-
-如果不想要 gentoo 的 stage3，也可直接 boot archlinux
+当然，如果想避免麻烦，直接 archlinux arm 最为简洁。
 
 ```shell
 doas bsdtar -xpf ./ArchLinuxARM-aarch64-latest.tar.gz -C /mnt
 ```
 
-最后莫忘忘记 arch-chroot /mnt 为 root 添加密码
-
-and ...
-
-# 2. extlinux
-
+# 3. extlinux
 
 ```shell
 cd /mnt/boot
 doas mkdir extlinux
 cd extlinux
 doas tee extlinux.conf << EOF
-LABEL gentoo
-    LINUX /boot/Image
-    INITRD /boot/initramfs-linux.img
-    FDT /boot/rk3328-roc-cc.dtb  # 若没有移动文件，默认位置是 /boot/dtbs/rockchip/...
-    APPEND earlycon=uart8250,mmio32,0xff130000 console=ttyS2,1500000 \
-rw rootwait rootfstype=ext4 root=UUID=$(lsblk -f | grep sdb1 | awk '{print $4}')  # 请单独运行指令补充 UUID
+label gentoo
+    kernel /boot/Image
+    initrd /boot/initramfs-linux.img
+    fdt /boot/dtbs/rockchip/rk3328-roc-cc.dtb
+    append root=PARTUUID=$(blkid /dev/sdb1) rw rootwait console=ttyS2,1500000
+    # 除了 /boot 下对应的文件，切记 PARTUUID 和 UUID 的辨析。
 EOF
 ```
 
-BOOM! 成功启动
+# 4. start
 
+BOOM! 成功启动
