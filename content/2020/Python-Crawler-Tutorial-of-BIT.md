@@ -2,7 +2,7 @@
 layout: blog
 title: Python Crawler Tutorial of BIT
 date: 2020-03-13 22:24:36
-tags:
+tags: python, crawler
 ---
 
 # 一、Week1:规则

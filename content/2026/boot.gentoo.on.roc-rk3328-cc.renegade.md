@@ -1,7 +1,7 @@
 ---
 title: boot gentoo on roc-rk3328-cc renegade
 date: 2026-05-03 11:25
-tags: arm gentoo
+tags: arm, gentoo, cross compile
 ---
 
 [TOC]

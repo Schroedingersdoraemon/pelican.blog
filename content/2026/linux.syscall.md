@@ -1,7 +1,7 @@
 ---
 title: linux system call
 date: 2026-03-07 05:59
-tags:
+tags: syscall
 ---
 
 [TOC]

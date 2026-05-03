@@ -2,7 +2,7 @@
 layout: blog
 title: '(updating) sed, a stream editor'
 date: 2021-08-16 18:11:17
-tags:
+tags: sed
 ---
 
 # 0. abstract

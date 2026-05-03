@@ -2,7 +2,7 @@
 layout: blog
 title: Data Classfication
 date: 2021-04-18 13:16:17
-tags:
+tags: deep learning
 ---
 
 ```python

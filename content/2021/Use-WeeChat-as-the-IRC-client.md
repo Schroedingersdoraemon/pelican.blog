@@ -2,7 +2,7 @@
 layout: blog
 title: Use WeeChat as the IRC client
 date: 2021-10-15 22:44:10
-tags:
+tags: IRC
 ---
 
 # 0. abstract

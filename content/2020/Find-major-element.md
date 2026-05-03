@@ -2,7 +2,7 @@
 layout: blog
 title: Algorithm Find major element
 date: 2020-10-19 23:11:56
-tags:
+tags: algorithms
 ---
 
 # 0. abstract

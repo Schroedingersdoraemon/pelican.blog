@@ -1,6 +1,7 @@
 Dark Souls 2 Custom Server
 ##########################
 :date: 2024-12-14 00:16
+:tags: game
 
 .. contents::
 

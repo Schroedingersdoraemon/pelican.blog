@@ -1,6 +1,7 @@
 Word Power Made Easy
 ####################
 :date: 2024-06-25 00:10
+:tags: English
 
 .. contents::
 

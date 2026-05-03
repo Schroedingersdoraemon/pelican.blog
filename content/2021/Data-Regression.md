@@ -2,7 +2,7 @@
 layout: blog
 title: Data Regression
 date: 2021-04-11 12:58:42
-tags:
+tags: deep learning, machine learning
 ---
 
 Regress to a sine function.

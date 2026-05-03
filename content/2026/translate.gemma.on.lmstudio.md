@@ -1,7 +1,7 @@
 ---
 title: TranslateGemma on LMStudio
 date: 2026-04-24 22:05
-tags:
+tags: LLM
 ---
 
 [TOC]

@@ -1,7 +1,7 @@
 ---
 title: IPv6 support for multiple subnodes in campus network
 date: 2022-07-29 18:41:05
-tags:
+tags: ipv6, router
 ---
 
 # 1. WAN

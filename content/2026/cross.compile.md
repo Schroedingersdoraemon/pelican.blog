@@ -1,7 +1,7 @@
 ---
 title: cross compile
 date: 2026-04-16 16:54
-tags:
+tags: cross compile
 ---
 
 [TOC]

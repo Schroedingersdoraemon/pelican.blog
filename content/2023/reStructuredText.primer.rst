@@ -1,6 +1,7 @@
 reStructuredText primer
 #######################
 :date: 2023-04-10 17:46
+:tags: rst
 
 .. contents::
 

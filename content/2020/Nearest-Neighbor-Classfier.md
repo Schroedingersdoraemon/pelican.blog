@@ -2,7 +2,7 @@
 layout: blog
 title: Nearest Neighbor Classfier
 date: 2020-09-26 16:23:18
-tags:
+tags: machine learning
 ---
 
 首先需要[下载cifar-10数据集](http://www.cs.toronto.edu/~kriz/cifar.html)

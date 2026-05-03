@@ -1,7 +1,7 @@
 ---
 title: Hosting your dedicated VPN on your own server
 date: 2022-04-28 23:16:52
-tags:
+tags: vpn
 ---
 
 # 1. Prerequisite

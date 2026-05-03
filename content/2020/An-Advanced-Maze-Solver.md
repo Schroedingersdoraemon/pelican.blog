@@ -2,7 +2,7 @@
 layout: blog
 title: An Advanced Maze Solver
 date: 2020-11-25 06:15:33
-tags:
+tags: algorithms
 ---
 
 ## Solve the randomly generated maze with the size of 37 using Depth First Search, DFS.

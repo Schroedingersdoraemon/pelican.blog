@@ -1,7 +1,7 @@
 ---
 title: operating system
 date: 2026-04-03 18:03
-tags:
+tags: OS
 ---
 
 [TOC]

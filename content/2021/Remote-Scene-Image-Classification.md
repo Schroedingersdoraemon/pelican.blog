@@ -2,7 +2,7 @@
 layout: blog
 title: Remote Scene Image Classification
 date: 2021-05-06 11:48:02
-tags:
+tags: deep learning
 ---
 
 <iframe

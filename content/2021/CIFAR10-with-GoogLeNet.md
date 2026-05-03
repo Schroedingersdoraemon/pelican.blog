@@ -2,7 +2,7 @@
 layout: blog
 title: CIFAR-10 with GoogLeNet
 date: 2021-05-16 11:32:45
-tags:
+tags: deep learning
 ---
 
 # 1. train part

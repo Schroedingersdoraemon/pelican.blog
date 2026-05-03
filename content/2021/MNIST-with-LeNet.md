@@ -2,7 +2,7 @@
 layout: blog
 title: MNIST with LeNet
 date: 2021-05-02 00:03:52
-tags:
+tags: deep learning
 ---
 
 # 1. train part

@@ -2,7 +2,7 @@
 layout: blog
 title: Dog Cat Dual Classification
 date: 2021-04-25 10:18:57
-tags:
+tags: deep learning
 ---
 
 ```python

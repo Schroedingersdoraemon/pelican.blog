@@ -2,7 +2,7 @@
 layout: blog
 title: use dwm to manage your windows
 date: 2020-09-04 22:18:56
-tags:
+tags: dwm
 ---
 
 # 1. introduction

@@ -2,7 +2,7 @@
 layout: blog
 title: deploy darknet with CUDA and OpenCV support on Arch Linux
 date: 2020-09-03 20:55:10
-tags:
+tags: opencv, cuda, darknet
 ---
 
 ![predicted image](/files/deploy-darknet-with-CUDA-and-OpenCV-support/predictions.jpg)

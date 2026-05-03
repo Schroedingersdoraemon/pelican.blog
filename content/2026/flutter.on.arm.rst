@@ -1,6 +1,7 @@
 build flutter on arm linux
 ##########################
 :date: 2026-02-26 21:40
+:tags: flutter
 
 .. contents::
 

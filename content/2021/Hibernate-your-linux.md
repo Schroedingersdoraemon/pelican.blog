@@ -2,7 +2,7 @@
 layout: blog
 title: Hibernate your linux
 date: 2021-08-13 14:49:42
-tags:
+tags: linux
 ---
 
 # 0. abstract

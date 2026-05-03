@@ -2,7 +2,7 @@
 layout: blog
 title: "How do you perfectly run QQ and WeChat using wine?"
 date: 2020-04-29 19:23:56
-tags:
+tags: wine
 ---
 
 Dec 24, 2022: The official native client is released.
