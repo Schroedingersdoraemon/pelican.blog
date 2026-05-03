@@ -33,7 +33,7 @@
             {% for article in articles %}
             <tr>
                 <td>{{ article.date.strftime('%b %d') }}</td>
-                <td><a href="/{{ article.url }}" target="_black">{{ article.title }}</a>
+                <td><a href="/{{ article.url }}" target="_blank">{{ article.title }}</a>
             </tr>
             {% endfor %}
         {% endfor %}
@@ -52,6 +52,7 @@
           {% for name, link in SOCIAL %}
           <td><a href="{{ link }}">{{ name }}</a></td>
           {% endfor %}
+          <td><a href="tags" target="/tags.html">tags</a></td>
       </table>
     </div>
     
