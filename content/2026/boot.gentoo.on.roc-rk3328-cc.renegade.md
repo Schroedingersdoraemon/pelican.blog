@@ -235,9 +235,17 @@ label gentoo
     initrd /boot/initramfs-linux.img
     fdt /boot/dtbs/rockchip/rk3328-roc-cc.dtb
     append root=PARTUUID=$(blkid /dev/sdb1) rw rootwait console=ttyS2,1500000
+
     # 除了 /boot 下对应的文件，切记 PARTUUID 和 UUID 的辨析。
 EOF
 ```
+
+也可这么写 append，但是记得删除换行，
+
+> append earlycon=uart8250,mmio32,0xff130000 \
+>  console=ttyS2,1500000 \
+>  console=tty0root=PARTUUID=b921b045-1d \
+>  rw rootwait rootfstype=ext4 loglevel=7
 
 # 4. start
 
