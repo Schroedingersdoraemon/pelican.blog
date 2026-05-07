@@ -8,7 +8,16 @@ tags: LLM
 
 ## 0. llama.cpp
 
-edit `~/.config/systemd/user/llama-translate.service`
+gentoo 若要启用 `--cache-type-k q8_0` 特性，请增加 AMDGPU_TARGETS
+
+```conf
+# 6750gre 12g 是 gfx1031，但是某些特性依赖 gfx1030
+AMDGPU_TARGETS="gfx1031 gfx1030"
+```
+
+## 1. llama-translator.service
+
+edit `~/.config/systemd/user/llama-translator.service`
 
 ```systemd
 [Unit]
@@ -22,20 +31,25 @@ Type=simple
 WorkingDirectory=%h/.llm.models/translategemma-4b-it
 
 # 环境变量（避免写死路径）
-Environment=MODEL=translategemma-4b-it
-Environment=PORT=1234
-Environment=CTX=1024
+Environment="MODEL=translategemma-4b-it"
+# 如果要用到 --cache-type-k 等特性，需要 uncomment 以下
+# Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"
 
 # 启动命令
 ExecStart=/usr/bin/llama-server \
   --model ${MODEL}.q4_k_s.gguf \
+  --host 0.0.0.0 \
+  --port 1234 \
+  --sleep-idle-seconds 300 \
+  --kv-unified \
+  --parallel 8 \
+  --ctx-size 4096 \
+  --temperature 0.1 \
   --jinja \
   --chat-template-file en_zh_translate.jinja \
-  --host 0.0.0.0 \
-  --port ${PORT} \
-  -c ${CTX} \
-  --sleep-idle-seconds 300
 
+# --metrics \
+# --verbose
 
 # 自动重启
 # Restart=always
@@ -51,27 +65,68 @@ StandardError=journal
 
 [Install]
 WantedBy=default.target
-
-
 ```
+
+## 2. jinja template
 
 `~/.llm.models/translategemma-4b-it/en_zh_translate.jinja`
 
 ```jinja
-{{ bos_token }}
+{{ bos_token -}}
 <start_of_turn>user
 You are a professional English (en) to Chinese (zh-CN) translator.
 Your goal is to accurately convey the meaning and nuances of the original English text while adhering to Chinese grammar, vocabulary, and cultural sensitivities.
-Produce only the Chinese translation, without any additional explanations or commentary.
-Do not translate URLs, code, or proper nouns unless necessary.
-Please translate the following English text into Chinese:
 
+# Translation Rules
+1. Produce only the translated text. Do not include any tags, explanations, or quotes.
+2. Do not translate URLs, code, units, proper nouns unless necessary.
+3. Maintain the original paragraph structure and format.
+4. If the text contains HTML tags, maintain their appropriate placement in the translation.
 
-{{ messages[-1]["content"] | trim }}
+# Text to be translated:
+{{ (messages | last).content | trim  }}
 <end_of_turn>
 <start_of_turn>model
 
 ```
+
+## 3. for ImmersiveTrans
+
+沉浸式翻译有三个 prompt
+
+- system prompt
+- multi-paragraph prompt
+- single-paragraph prompt
+
+既然我们已经在 llama-server 的 jinja 指定了 system prompt，**此处留空**。
+
+对于 multi-paragraph prompt：
+
+- 1.可以手动制定 %% 为分隔符
+
+```jinja
+Translate these paragraphs using %% as separator:
+{{text}}
+```
+
+- 2.也可直接传入原段落，问题不大
+
+```jinja
+{{text}}
+```
+
+对于 single-paragraph prompt 同样只保留 `{{text}}` 即可。
+
+**值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem**
+
+```text
+敏捷的狐狸跳过...
+我能够吞下玻璃...
+```
+
+由于 llama-server 制定了 `--parallel 8`，我们可以设置
+
+`每秒最大请求数2 x 每次请求最大段落数4 = parallel 8`
 
 ## (deprecated ver). lmstudio
 

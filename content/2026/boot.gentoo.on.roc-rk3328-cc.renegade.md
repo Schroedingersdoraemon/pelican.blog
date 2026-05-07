@@ -66,6 +66,31 @@ make HOSTCC=clang LLVM=1 CROSS_COMPILE=aarch64-unknown-linux-gnu- CC=clang -j10
 
 获得了 **idbloader.img** 和 **u-boot.itb**。
 
+再根据 rockchip 官网处的 [Default storage map](https://opensource.rock-chips.com/wiki_Partitions)
+
+```shell
+# 烧录 idbloader.img 到偏移量 32KB 处(对应扇区64)
+doas dd if=idbloader.img of=/dev/sdX conv=fsync,notrunc bs=512 seek=64
+# 烧录 u-boot.itb 到偏移量 8MB 处(对应扇区16384)
+doas dd if=u-boot.itb of=/dev/sdX conv=fsync,notrunc bs=512 seek=16384
+```
+
+| Partition      | start sec | Start(h) | Number of Sectors | Secs(h)  | Part Size | Size   | PartNum in GPT | Requirements                         |
+| -------------- | --------- | -------- | ----------------- | -------- | --------- | ------ | -------------- | ------------------------------------ |
+| MBR            | 0         | 00000000 | 1                 | 00000001 | 512       | 0.5KB  |                |                                      |
+| Primary GPT    | 1         | 00000001 | 63                | 0000003F | 32256     | 31.5KB |                |                                      |
+| loader1        | 64        | 00000040 | 7104              | 00001bc0 | 4096000   | 2.5MB  | 1              | preloader (miniloader or U-Boot SPL) |
+| Vendor Storage | 7168      | 00001c00 | 512               | 00000200 | 262144    | 256KB  |                | SN, MAC and etc.                     |
+| Reserved Space | 7680      | 00001e00 | 384               | 00000180 | 196608    | 192KB  |                | Not used                             |
+| reserved1      | 8064      | 00001f80 | 128               | 00000080 | 65536     | 64KB   |                | legacy DRM key                       |
+| U-Boot ENV     | 8128      | 00001fc0 | 64                | 00000040 | 32768     | 32KB   |                |                                      |
+| reserved2      | 8192      | 00002000 | 8192              | 00002000 | 4194304   | 4MB    |                | legacy parameter                     |
+| loader2        | 16384     | 00004000 | 8192              | 00002000 | 4194304   | 4MB    | 2              | U-Boot or UEFI                       |
+| trust          | 24576     | 00006000 | 8192              | 00002000 | 4194304   | 4MB    | 3              | trusted-os like ATF, OP-TEE          |
+| boot（must）   | 32768     | 00008000 | 229376            | 00038000 | 117440512 | 112MB  | 4              | kernel, dtb, extlinux.conf, ramdisk  |
+| rootfs         | 262144    | 00040000 | -                 | -        | -         | -MB    | 5              | Linux system                         |
+| Secondary GPT  | 16777183  | 00FFFFDF | 33                | 00000021 | 16896     | 16.5KB |                |                                      |
+
 ## 0.1. (optional) retrieve armbian boot
 
 首先获取 [armbian renegade noble](https://mirrors.bfsu.edu.cn/armbian-releases/renegade/archive)
