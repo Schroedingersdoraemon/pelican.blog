@@ -6,6 +6,16 @@ tags: LLM
 
 [TOC]
 
+## -1. Update
+
+2026 年 5 月 18 日：换成了 [HY-MT1.5-7B](https://huggingface.co/tencent/HY-MT1.5-7B)
+
+## -0.9. Update
+
+2026 年 5 月 25 日：换成了 [Hy-MT2-1.8B](https://huggingface.co/tencent/Hy-MT2-1.8B)
+
+并发速度有所上升，另外文件 `en_zh_translate.jinja` 也略有改变
+
 ## 0. llama.cpp
 
 gentoo 若要启用 `--cache-type-k q8_0` 特性，请增加 AMDGPU_TARGETS
@@ -16,6 +26,12 @@ AMDGPU_TARGETS="gfx1031 gfx1030"
 ```
 
 ## 1. llama-translator.service
+
+### 1.1. translategemma
+
+<details>
+
+<summary>这是旧的 translategemma-4b 的有关内容</summary>
 
 edit `~/.config/systemd/user/llama-translator.service`
 
@@ -67,7 +83,127 @@ StandardError=journal
 WantedBy=default.target
 ```
 
+</details>
+
+### 1.2. hy-mt1.5
+
+<details>
+
+<summary>这是旧的 hy-mt1.5-7b 的有关内容</summary>
+
+edit `~/.config/systemd/user/llama-translator-hy.service`
+
+```systemd
+[Unit]
+Description=llama.cpp translation service
+After=network.target
+
+[Service]
+Type=simple
+
+# 工作目录（模型和脚本都在这里）
+WorkingDirectory=%h/.llm.models/HY-MT1.5-7B-GGUF
+
+# 环境变量（避免写死路径）
+Environment="MODEL=HY-MT1.5-7B-Q4_K_M"
+
+# 启动命令
+ExecStart=/usr/bin/llama-server \
+  --model ${MODEL}.gguf \
+  --host 0.0.0.0 \
+  --port 1234 \
+  --sleep-idle-seconds 300 \
+  --kv-unified \
+  --parallel 8 \
+  --ctx-size 4096 \
+  --no-cache-prompt \
+  --temperature 0.1 \
+  --jinja \
+  --chat-template-file en_zh_translate.jinja \
+  --verbose
+
+# --metrics
+# 自动重启
+# Restart=always
+# RestartSec=2
+
+# 日志直接进 journald
+StandardOutput=journal
+StandardError=journal
+
+# 可选：限制资源（建议加）
+# MemoryMax=8G
+# CPUQuota=200%
+
+[Install]
+WantedBy=default.target
+```
+
+</details>
+
+### 1.3. hy-mt2
+
+<details open>
+
+<summary>这是 hy-mt2-1.8b 的有关内容</summary>
+
+edit `~/.config/systemd/user/llama-translator-hy.service`
+
+```systemd
+[Unit]
+Description=llama.cpp translation service
+After=network.target
+
+[Service]
+Type=simple
+
+# 工作目录（模型和脚本都在这里）
+WorkingDirectory=%h/.llm.models/HY-MT2-1.8B-GGUF
+
+# 环境变量（避免写死路径）
+Environment="MODEL=HY-MT2-1.8B-Q8_0"
+
+# 启动命令
+ExecStart=/usr/bin/llama-server \
+  --model ${MODEL}.gguf \
+  --host 0.0.0.0 \
+  --port 1234 \
+  --sleep-idle-seconds 300 \
+  --kv-unified \
+  --parallel 8 \
+  --ctx-size 4096 \
+  --no-cache-prompt \
+  --temperature 0.1 \
+  --jinja \
+  --chat-template-file en_zh_translate.jinja \
+  --verbose
+
+# --metrics
+# 自动重启
+# Restart=always
+# RestartSec=2
+
+# 日志直接进 journald
+StandardOutput=journal
+StandardError=journal
+
+# 可选：限制资源（建议加）
+# MemoryMax=8G
+# CPUQuota=200%
+
+[Install]
+WantedBy=default.target
+```
+
+</details>
+
 ## 2. jinja template
+
+### 2.1. translategemma-4b
+
+<details>
+
+<summary>这是旧的 translategemma-4b 的有关内容</summary>
 
 `~/.llm.models/translategemma-4b-it/en_zh_translate.jinja`
 
@@ -89,6 +225,50 @@ Your goal is to accurately convey the meaning and nuances of the original Englis
 <start_of_turn>model
 
 ```
+
+</details>
+
+### 2.2. hy-mt1.5-7b
+
+<details>
+
+<summary>这是旧的 hy-mt1.5-7b 的有关内容</summary>
+
+`~/.llm.models/HY-MT1.5-7B-GGUF/en_zh_translate.jinja`
+
+```jinja
+{% set last_user =
+    messages
+    | selectattr("role", "equalto", "user")
+    | last
+%}
+
+<|startoftext|>
+Translate the following segment into zh, without additional explanation.
+
+{{ last_user.content | trim }}<|extra_0|>
+```
+
+</details>
+
+### 2.3. hy-mt2-1.8b
+
+<details open>
+
+<summary>这是 hy-mt2-1.8b 的有关内容</summary>
+
+```jinja
+{%- set user_text = messages[-1]['content'] -%}
+
+<｜hy_begin▁of▁sentence｜>
+Translate the following text into Chinese. Output only the translation, no explanation.
+<｜hy_place▁holder▁no▁3｜>
+{{ user_text | trim }}
+<｜hy_Assistant｜>
+
+```
+
+</details>
 
 ## 3. for ImmersiveTrans
 
@@ -129,6 +309,10 @@ Translate these paragraphs using %% as separator:
 `每秒最大请求数2 x 每次请求最大段落数4 = parallel 8`
 
 ## (deprecated ver). lmstudio
+
+<details>
+
+<summary>伟大探索时期的遗留</summary>
 
 提示词来自[这里](https://ollama.com/library/translategemma)
 
@@ -184,3 +368,5 @@ Please translate the following English text into Chinese:
 {{ '<start_of_turn>model\n' }}
 {% endif %}
 ```
+
+</details>
