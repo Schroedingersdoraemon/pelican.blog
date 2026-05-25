@@ -75,5 +75,11 @@ github: publish
 	ghp-import -m "Generate Pelican site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUTDIR)"
 	git push origin $(GITHUB_PAGES_BRANCH)
 
+remote: publish
+	@echo "Pushing output/ to GitHub Pages..."
+	cd $(OUTPUTDIR) && \
+	git add . && \
+	git diff --staged --quiet || git commit -m "Update site: $$(date)" && \
+	git push origin master
 
-.PHONY: html help clean regenerate serve serve-global devserver publish github
+.PHONY: html help clean regenerate serve serve-global devserver publish github remote
