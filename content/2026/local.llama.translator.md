@@ -1,5 +1,5 @@
 ---
-title: Deploy TranslateGemma Locally
+title: deploy llama translator locally
 date: 2026-05-06 22:05
 tags: LLM
 ---
@@ -170,13 +170,15 @@ ExecStart=/usr/bin/llama-server \
   --port 1234 \
   --sleep-idle-seconds 300 \
   --kv-unified \
-  --parallel 8 \
-  --ctx-size 4096 \
-  --no-cache-prompt \
-  --temperature 0.1 \
+  --flash-attn on \
+  --parallel 12 \
+  --ctx-size 32768 \
+  --cache-reuse 1024 \
+  --temperature 0 \
   --jinja \
+  --mlock \
   --chat-template-file en_zh_translate.jinja \
-  --verbose
+  --metrics
 
 # --metrics
 # 自动重启
@@ -297,16 +299,32 @@ Translate these paragraphs using %% as separator:
 
 对于 single-paragraph prompt 同样只保留 `{{text}}` 即可。
 
-**值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem**
+- 3.**值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem**
 
 ```text
 敏捷的狐狸跳过...
 我能够吞下玻璃...
 ```
 
-由于 llama-server 制定了 `--parallel 8`，我们可以设置
+- 4.一些个超参数
 
-`每秒最大请求数2 x 每次请求最大段落数4 = parallel 8`
+大量短句只消耗 20-50 tokens，但是预处理 prompt eval 依然要花 30ms。
+因而增加 **每次请求最大段落数 32** 并行处理。
+
+网页翻译滚动时大量段落，因此限制 **每秒最大请求数 4** ，理论上每秒处理上限 128 段。
+
+根据利特尔法则 $ 并发数 (Slots) = 到达率 (Requests/sec) × 处理时间 (Latency) $
+此处每秒处理 4 个请求，平均处理时间根据日志约 5 秒，所需 slot 为 20.
+快速翻页时， `--parallel 12` 处理每秒的 4 次请求依然会产生排队。
+但是考虑到阅读会停顿，所以无妨。
+
+`--ctx-size 32768` (32K 上下文)
+1.8B 模型占用 2GB，6750GRE 12GB 还有 10G，llama-server 所有 Slot 共享 ctx-size。
+32768 ÷ 8 slots = 4096 tokens/slot
+如果有某个请求包含超长文本，4000 tokens 的 Slot 余裕足以应付，不会触发 context shift
+
+`--cache-reuse 1024`
+翻译任务高度重复，因为新请求里有很大一部分（Prompt 头部指令）和之前的请求一模一样。
 
 ## (deprecated ver). lmstudio
 
