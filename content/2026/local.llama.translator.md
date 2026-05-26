@@ -277,43 +277,43 @@ Translate the following text into Chinese. Output only the translation, no expla
 沉浸式翻译有三个 prompt
 
 - system prompt
-- multi-paragraph prompt
-- single-paragraph prompt
 
 既然我们已经在 llama-server 的 jinja 指定了 system prompt，**此处留空**。
 
-对于 multi-paragraph prompt：
+- multi-paragraph prompt
 
-- 1.可以手动制定 %% 为分隔符
+默认的是手动制定 %% 为分隔符
 
 ```jinja
 Translate these paragraphs using %% as separator:
 {{text}}
 ```
 
-- 2.也可直接传入原段落，问题不大
+可直接传入原段落，问题不大
 
 ```jinja
 {{text}}
 ```
 
-对于 single-paragraph prompt 同样只保留 `{{text}}` 即可。
+- single-paragraph prompt
 
-- 3.**值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem**
+  对于 single-paragraph prompt 同样只保留 `{{text}}` 即可。
+
+**值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem**
 
 ```text
 敏捷的狐狸跳过...
 我能够吞下玻璃...
 ```
 
-- 4.一些个超参数
+- 一些个超参数
 
 大量短句只消耗 20-50 tokens，但是预处理 prompt eval 依然要花 30ms。
 因而增加 **每次请求最大段落数 32** 并行处理。
 
 网页翻译滚动时大量段落，因此限制 **每秒最大请求数 4** ，理论上每秒处理上限 128 段。
 
-根据利特尔法则 $ 并发数 (Slots) = 到达率 (Requests/sec) × 处理时间 (Latency) $
+根据利特尔法则 $并发数 (Slots) = 到达率 (Requests/sec) × 处理时间 (Latency)$
 此处每秒处理 4 个请求，平均处理时间根据日志约 5 秒，所需 slot 为 20.
 快速翻页时， `--parallel 12` 处理每秒的 4 次请求依然会产生排队。
 但是考虑到阅读会停顿，所以无妨。
