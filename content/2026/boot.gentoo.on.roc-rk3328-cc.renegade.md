@@ -6,12 +6,27 @@ tags: arm, gentoo, cross compile
 
 [TOC]
 
+---
+
+The prescribed way is:
+
+~[0.2. libretech-flash-tool](#02-libretech-flash-tool)~
+
+update: libretech-flash-tool is not recommended.
+
+[1.2. flash your card](#12-if-libretech-flash-tool)
+
+[2.2.2. archlinux arm (alarm)](#222-alarm)
+
+[3. extlinux](#3-extlinux)
+
 # 0. boot
 
-boot 有两种方法
+boot 有三种方法
 
 - [从头编译uboot](#00-compile-uboot)
 - [拿来主义：巧得二进制](#01-optional-retrieve-armbian-boot)
+- [更好用的工具](#02-libretech-flash-tool)
 
 ## 0.0. compile uboot
 
@@ -107,7 +122,33 @@ xz -d -c ./Armbian_26.2.1_Renegade_noble_current_6.18.8_minimal.img.xz \
     | doas dd of=rk3328_boot.bin bs=512 count=32768
 ```
 
+## 0.2. libretech-flash-tool
+
+2026 年 06 月 1 日[网上冲浪](https://hub.libre.computer/t/libre-computer-flash-tool/321)时，发现自由电脑项目提供了一个工具 [libretech-flash-tool](https://github.com/libre-computer-project/libretech-flash-tool)
+
+如此方便令人感叹
+
+```shell
+git clone https://github.com/libre-computer-project/libretech-flash-tool.git
+cd libretech-flash-tool
+
+./lft.sh board-list
+...
+roc-rk3328-cc
+
+./lft.sh dev-list
+sdb  # 不一定是 sdb
+
+sudo ./lft.sh bl-flash aml-s905x-cc sdb  # 一定要确定是 tf 卡
+```
+
 # 1. flash your card
+
+- [if compile uboot yourself (0.0)](#11-if-compiled-uboot-or-grab-it)
+- [if retrieve armbian boot (0.1)](#11-if-compiled-uboot-or-grab-it)
+- [if libretech-flash-tool (0.2)](#12-if-libretech-flash-tool)
+
+## 1.1. if compiled uboot or grab it
 
 初始化 tf 卡，数据无价，谨慎操作！
 
@@ -152,6 +193,23 @@ doas mkfs.ext4 /dev/sdb1
 >
 > doas e2fsck -f /dev/sdb1  
 > doas resize2fs /dev/sdb1
+
+## 1.2. if libretech-flash-tool
+
+直接格式化分区即可
+
+```shell
+doas fdisk /dev/sdb
+n # 创建新分区
+1 # 默认是1
+回车 # 默认开始 2048
+回车 # 默认扩展到最后
+w # write
+q # quit
+
+# 然后格式化分区
+doas mkfs.ext4 /dev/sdb1
+```
 
 # 2. kernel
 

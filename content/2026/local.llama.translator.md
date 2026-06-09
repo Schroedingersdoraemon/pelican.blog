@@ -25,6 +25,12 @@ gentoo 若要启用 `--cache-type-k q8_0` 特性，请增加 AMDGPU_TARGETS
 AMDGPU_TARGETS="gfx1031 gfx1030"
 ```
 
+**对于某些多模态场景，请增加参数：**
+
+```systemd
+Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"
+```
+
 ## 1. llama-translator.service
 
 ### 1.1. translategemma
@@ -255,9 +261,9 @@ Translate the following segment into zh, without additional explanation.
 
 ### 2.3. hy-mt2-1.8b
 
-<details open>
+<details>
 
-<summary>这是 hy-mt2-1.8b 的有关内容</summary>
+<summary>这是旧的 hy-mt2-1.8b 有关内容</summary>
 
 ```jinja
 {%- set user_text = messages[-1]['content'] -%}
@@ -266,6 +272,31 @@ Translate the following segment into zh, without additional explanation.
 Translate the following text into Chinese. Output only the translation, no explanation.
 <｜hy_place▁holder▁no▁3｜>
 {{ user_text | trim }}
+<｜hy_Assistant｜>
+
+```
+
+</details>
+
+<details open>
+
+<summary>这是 gemini 给的 hy-mt2-1.8b 的有关内容</summary>
+
+```jinja
+{%- set user_text = messages[-1]['content'] -%}
+
+<｜hy_begin▁of▁sentence｜>
+Keep all "%%".
+Match the input structure.
+No explanation.
+Translate the following text into Chinese.
+<｜hy_place▁holder▁no▁3｜>
+
+<｜hy_User｜>
+Text:
+{{ user_text | trim }}
+
+Translation:
 <｜hy_Assistant｜>
 
 ```
